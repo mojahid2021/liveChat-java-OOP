@@ -24,7 +24,6 @@ public class ServerClient implements ActionListener {
     private static JFrame f = new JFrame();
     private static DataOutputStream dout;
     private static DataInputStream din;
-    private Point initialClick;
 
     ServerClient() {
         f.setLayout(new CardLayout());
