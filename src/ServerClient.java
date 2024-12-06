@@ -1,14 +1,18 @@
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
 import java.sql.*;
-import java.text.*;
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
-public class Server implements ActionListener {
+public class ServerClient implements ActionListener {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/chat_app";
     private static final String DB_USER = "root";
     private static final String DB_PASS = "";
@@ -19,8 +23,10 @@ public class Server implements ActionListener {
     private static Box vertical = Box.createVerticalBox();
     private static JFrame f = new JFrame();
     private static DataOutputStream dout;
+    private static DataInputStream din;
+    private Point initialClick;
 
-    Server() {
+    ServerClient() {
         f.setLayout(new CardLayout());
 
         // Initialize Panels
@@ -33,7 +39,7 @@ public class Server implements ActionListener {
 
         // Frame Settings
         f.setSize(450, 680);
-        f.setLocation(900, 50);
+        f.setLocation(200, 50);
         f.setUndecorated(true);
         f.setVisible(true);
     }
@@ -77,7 +83,6 @@ public class Server implements ActionListener {
         });
         panel.add(loginButton);
 
-        // Removed the registerButton, added the registerLabel instead
         JLabel registerText = new JLabel("Don't have an account? Click here to register");
         registerText.setBounds(120, 270, 250, 30);
         registerText.setForeground(Color.BLUE);
@@ -235,26 +240,29 @@ public class Server implements ActionListener {
 
         return panel;
     }
-
     public static void main(String[] args) {
-        new Server();
+        ServerClient serverClient = new ServerClient(); // Create an instance of ServerClient
         try {
-            ServerSocket skt = new ServerSocket(6001);
+            Socket s = new Socket("127.0.0.1", 6001);
+            din = new DataInputStream(s.getInputStream());
+            dout = new DataOutputStream(s.getOutputStream());
+
+            // Start reading messages from the server
             while (true) {
-                Socket s = skt.accept();
-                DataInputStream din = new DataInputStream(s.getInputStream());
-                dout = new DataOutputStream(s.getOutputStream());
-                while (true) {
-                    String msg = din.readUTF();
+                String msg = din.readUTF(); // Read message from server
+                SwingUtilities.invokeLater(() -> {
                     JPanel panel = formatLabel(msg);
                     JPanel left = new JPanel(new BorderLayout());
                     left.add(panel, BorderLayout.LINE_START);
                     vertical.add(left);
+                    vertical.add(Box.createVerticalStrut(15));
+                    serverClient.messageArea.add(vertical, BorderLayout.PAGE_START); // Use the instance
                     f.validate();
-                }
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }
