@@ -1,5 +1,5 @@
-# This workflow builds a Java project using Gradle, caching dependencies to optimize build times.
-# For more information, see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+# This workflow builds a Java project using Gradle and caches dependencies to optimize build times.
+# It is compatible with projects developed in IntelliJ IDEA.
 
 name: Java CI with Gradle
 
@@ -17,16 +17,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    # Set up JDK 17 (the version you used in IntelliJ IDEA)
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
 
-    # Setup Gradle for caching dependencies
+    # Set up Gradle (use Gradle wrapper if available)
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4.0.0
 
+    # Run Gradle build using Gradle Wrapper (./gradlew)
     - name: Build with Gradle Wrapper
       run: ./gradlew build
 
@@ -37,12 +40,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    # Set up JDK 17
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
 
-    # Submit a dependency graph for Dependabot Alerts
+    # Generate and submit dependency graph for Dependabot Alerts
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@v4.0.0
