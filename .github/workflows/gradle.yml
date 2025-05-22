@@ -25,12 +25,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # Set up Gradle with a specific version in case the Gradle wrapper is not available
+    # Set up Gradle with a specific version if Gradle wrapper is not present
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4.0.0
       with:
         gradle-version: '8.9'  # Specify your desired version of Gradle here
 
-    # Run Gradle build using the specified Gradle version
+    # Run Gradle build
     - name: Build with Gradle
       run: gradle build
